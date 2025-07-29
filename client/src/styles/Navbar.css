@@ -1,7 +1,7 @@
 @import './variables.css';
 
 .navbar {
-  background: var(--primary-gradient);
+  background: var(--bg-dark);
   box-shadow: var(--shadow-lg);
   position: sticky;
   top: 0;
@@ -37,10 +37,12 @@
   margin: 0;
   font-size: 1.8rem;
   font-weight: 700;
-  background: linear-gradient(45deg, var(--text-white), var(--accent-green));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  /* Use solid white color matching footer */
+  color: var(--text-white);
+  background: none;
+  -webkit-background-clip: unset;
+  -webkit-text-fill-color: unset;
+  background-clip: unset;
 }
 
 .navbar-menu {

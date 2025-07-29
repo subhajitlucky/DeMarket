@@ -32,10 +32,12 @@
   /* Slightly smaller heading */
   font-size: 1.3rem;
   margin-bottom: var(--spacing-md);
-  background: linear-gradient(45deg, var(--text-white), var(--accent-green));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  /* Solid white text to match navbar */
+  background: none;
+  color: var(--text-white);
+  -webkit-background-clip: unset;
+  -webkit-text-fill-color: unset;
+  background-clip: unset;
 }
 
 .footer-section p {
