@@ -70,6 +70,40 @@ const SellPage = () => {
           </div>
         </header>
 
+        <div className="sell-info">
+          <h3>How it works</h3>
+          <div className="info-steps">
+            <div className="step">
+              <div className="step-number">1</div>
+              <div className="step-content">
+                <h4>Fill the form</h4>
+                <p>Provide details about your product including name, price, and quantity</p>
+              </div>
+            </div>
+            <div className="step">
+              <div className="step-number">2</div>
+              <div className="step-content">
+                <h4>Connect wallet</h4>
+                <p>Connect your Web3 wallet to sign the transaction</p>
+              </div>
+            </div>
+            <div className="step">
+              <div className="step-number">3</div>
+              <div className="step-content">
+                <h4>List on blockchain</h4>
+                <p>Your product gets listed on the smart contract</p>
+              </div>
+            </div>
+            <div className="step">
+              <div className="step-number">4</div>
+              <div className="step-content">
+                <h4>Start selling</h4>
+                <p>Customers can now buy your products directly</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <div className="sell-content">
           <div className="container">
             <div className="sell-form-container">
@@ -195,41 +229,7 @@ const SellPage = () => {
               </div>
             </div>
           </div>
-        </div>
-
-        <div className="sell-info">
-          <h3>How it works</h3>
-          <div className="info-steps">
-            <div className="step">
-              <div className="step-number">1</div>
-              <div className="step-content">
-                <h4>Fill the form</h4>
-                <p>Provide details about your product including name, price, and quantity</p>
-              </div>
-            </div>
-            <div className="step">
-              <div className="step-number">2</div>
-              <div className="step-content">
-                <h4>Connect wallet</h4>
-                <p>Connect your Web3 wallet to sign the transaction</p>
-              </div>
-            </div>
-            <div className="step">
-              <div className="step-number">3</div>
-              <div className="step-content">
-                <h4>List on blockchain</h4>
-                <p>Your product gets listed on the smart contract</p>
-              </div>
-            </div>
-            <div className="step">
-              <div className="step-number">4</div>
-              <div className="step-content">
-                <h4>Start selling</h4>
-                <p>Customers can now buy your products directly</p>
-              </div>
-            </div>
-            </div>
-          </div>
+                  </div>
         </div>
       </div>
     </div>
