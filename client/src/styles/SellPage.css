@@ -72,7 +72,7 @@
   padding: var(--spacing-lg);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-md);
-  width: 100%;
+  width: calc(100% - var(--spacing-md) * 2);
   box-sizing: border-box;
   margin: 0 var(--spacing-md);
 }
@@ -352,6 +352,7 @@
   
   .sell-info {
     margin: 0 var(--spacing-lg);
+    width: calc(100% - var(--spacing-lg) * 2);
   }
   
   .sell-header h1 {
@@ -413,6 +414,7 @@
   
   .sell-info {
     margin: 0 var(--spacing-xl);
+    width: calc(100% - var(--spacing-xl) * 2);
   }
   
   .info-steps {
@@ -462,11 +464,13 @@
     max-width: 1200px;
     margin: 0 auto;
     padding: 0 var(--spacing-xl);
+    width: 100%;
   }
   
   .sell-info .sell-info {
     margin: 0;
     padding: var(--spacing-xl);
+    width: 100%;
   }
   
   .info-steps {
