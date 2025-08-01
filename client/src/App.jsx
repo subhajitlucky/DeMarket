@@ -1,4 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import { WalletProvider } from './wallet/contexts/WalletContext'
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
 import HomePage from './pages/HomePage'
@@ -9,20 +10,22 @@ import './App.css'
 
 function App() {
   return (
-    <Router>
-      <div className="App">
-        <Navbar />
-        <main className="main-content">
-          <Routes>
-            <Route path="/" element={<HomePage />} />
-            <Route path="/products" element={<ProductsPage />} />
-            <Route path="/sell" element={<SellPage />} />
-            <Route path="/profile" element={<ProfilePage />} />
-          </Routes>
-        </main>
-        <Footer />
-      </div>
-    </Router>
+    <WalletProvider>
+      <Router>
+        <div className="App">
+          <Navbar />
+          <main className="main-content">
+            <Routes>
+              <Route path="/" element={<HomePage />} />
+              <Route path="/products" element={<ProductsPage />} />
+              <Route path="/sell" element={<SellPage />} />
+              <Route path="/profile" element={<ProfilePage />} />
+            </Routes>
+          </main>
+          <Footer />
+        </div>
+      </Router>
+    </WalletProvider>
   )
 }
 

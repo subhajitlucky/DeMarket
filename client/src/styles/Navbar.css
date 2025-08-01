@@ -91,9 +91,9 @@
 }
 
 .connect-wallet-btn {
-  background: rgba(255, 255, 255, 0.15);
+  background: linear-gradient(135deg, #2196F3, #1976D2);
   color: var(--text-white);
-  border: 2px solid rgba(255, 255, 255, 0.3);
+  border: 2px solid rgba(33, 150, 243, 0.5);
   padding: var(--spacing-md) var(--spacing-xl);
   border-radius: var(--radius-full);
   font-weight: 600;
@@ -104,10 +104,10 @@
 }
 
 .connect-wallet-btn:hover {
-  background: rgba(255, 255, 255, 0.25);
-  border-color: rgba(255, 255, 255, 0.5);
+  background: linear-gradient(135deg, #1976D2, #1565C0);
+  border-color: rgba(33, 150, 243, 0.8);
   transform: translateY(-2px);
-  box-shadow: var(--shadow-lg);
+  box-shadow: 0 8px 24px rgba(33, 150, 243, 0.3);
 }
 
 /* Mobile Styles */

@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import WalletConnect from '../wallet/components/WalletConnect'
 import '../styles/Navbar.css'
 
 const Navbar = () => {
@@ -25,9 +26,7 @@ const Navbar = () => {
         </div>
 
         <div className="navbar-wallet">
-          <button className="connect-wallet-btn">
-            Connect Wallet
-          </button>
+          <WalletConnect />
         </div>
       </div>
     </nav>

@@ -563,3 +563,119 @@
     font-size: 2rem;
   }
 }
+
+/* New state styles */
+.connect-prompt {
+  text-align: center;
+  padding: var(--spacing-2xl);
+  background: var(--white);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-md);
+  margin: var(--spacing-xl) 0;
+}
+
+.connect-prompt h3 {
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-md);
+}
+
+.connect-prompt p {
+  color: var(--text-secondary);
+  margin-bottom: var(--spacing-xl);
+}
+
+.loading-state {
+  text-align: center;
+  padding: var(--spacing-2xl);
+  background: var(--white);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-md);
+  margin: var(--spacing-xl) 0;
+}
+
+.loading-state p {
+  color: var(--text-secondary);
+  font-size: 1.1rem;
+}
+
+.error-state {
+  text-align: center;
+  padding: var(--spacing-2xl);
+  background: var(--white);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-md);
+  margin: var(--spacing-xl) 0;
+}
+
+.error-state p {
+  color: var(--danger);
+  margin-bottom: var(--spacing-lg);
+}
+
+.retry-btn {
+  background: var(--primary-gradient);
+  color: var(--white);
+  border: none;
+  padding: var(--spacing-sm) var(--spacing-lg);
+  border-radius: var(--border-radius-md);
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition-default);
+}
+
+.retry-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+.empty-state {
+  text-align: center;
+  padding: var(--spacing-2xl);
+  background: var(--white);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-md);
+  margin: var(--spacing-xl) 0;
+}
+
+.empty-state p {
+  color: var(--text-secondary);
+  margin-bottom: var(--spacing-sm);
+}
+
+.coming-soon {
+  text-align: center;
+  padding: var(--spacing-2xl);
+  background: var(--white);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-md);
+  margin: var(--spacing-xl) 0;
+}
+
+.coming-soon h4 {
+  color: var(--primary);
+  margin-bottom: var(--spacing-md);
+  font-size: 1.2rem;
+}
+
+.coming-soon p {
+  color: var(--text-secondary);
+  margin-bottom: var(--spacing-sm);
+}
+
+.activity-status {
+  padding: 4px 8px;
+  border-radius: var(--border-radius-sm);
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.activity-status.active {
+  background: var(--success-light);
+  color: var(--success);
+}
+
+.activity-status.sold-out {
+  background: var(--danger-light);
+  color: var(--danger);
+}

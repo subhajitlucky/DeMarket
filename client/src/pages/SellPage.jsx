@@ -1,7 +1,10 @@
 import { useState } from 'react'
+import { useWallet } from '../wallet/contexts/WalletContext'
+import { addProduct } from '../utils/contract'
 import '../styles/SellPage.css'
 
 const SellPage = () => {
+  const { signer, isConnected, connectWallet } = useWallet()
   const [formData, setFormData] = useState({
     name: '',
     price: '',
@@ -33,26 +36,37 @@ const SellPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+    
+    if (!isConnected || !signer) {
+      alert('Please connect your wallet to list products')
+      return
+    }
+
     setIsSubmitting(true)
 
     try {
-      // TODO: Implement blockchain integration
-      console.log('Product to list:', formData)
+      const result = await addProduct(
+        signer, 
+        formData.name, 
+        formData.price, 
+        parseInt(formData.quantity)
+      )
       
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2000))
-      
-      alert('Product listed successfully! (Blockchain integration coming soon)')
-      
-      // Reset form
-      setFormData({
-        name: '',
-        price: '',
-        quantity: '',
-        category: 'fruits',
-        description: '',
-        image: '🍎'
-      })
+      if (result.success) {
+        alert('Product listed successfully on the blockchain!')
+        
+        // Reset form
+        setFormData({
+          name: '',
+          price: '',
+          quantity: '',
+          category: 'fruits',
+          description: '',
+          image: '🍎'
+        })
+      } else {
+        alert('Error listing product: ' + result.error)
+      }
     } catch (error) {
       alert('Error listing product: ' + error.message)
     } finally {
