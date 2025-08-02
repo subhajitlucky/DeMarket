@@ -405,34 +405,62 @@ export const getContract = (signerOrProvider) => {
 
 // 🌐 GET DEFAULT PROVIDER (for read-only operations without wallet)
 export const getDefaultProvider = () => {
-  // Use public Sepolia RPC endpoints (no API key needed)
-  return new ethers.JsonRpcProvider('https://sepolia.drpc.org')
+  // Use reliable public Sepolia RPC endpoints with fallback
+  const rpcUrls = [
+    'https://rpc.sepolia.org',
+    'https://sepolia.gateway.tenderly.co',
+    'https://ethereum-sepolia.blockpi.network/v1/rpc/public',
+    'https://rpc2.sepolia.org'
+  ]
+  
+  // Try first RPC, can add fallback logic later
+  return new ethers.JsonRpcProvider(rpcUrls[0])
 }
 
 // 📊 GET ALL ACTIVE PRODUCTS (Uses direct contract calls)
 export const getAllProducts = async (provider) => {
   try {
+    console.log('🔍 Fetching products with provider:', provider.connection?.url || 'Unknown RPC')
+    
     const contract = getContract(provider)
+    console.log('📋 Contract instance created, getting product count...')
+    
     const productCount = await contract.productCount()
+    console.log(`📊 Total products found: ${productCount}`)
+    
+    if (productCount === 0n) {
+      console.log('⚠️ No products in contract')
+      return []
+    }
+    
     const products = []
 
     for (let i = 1; i <= productCount; i++) {
+      console.log(`📦 Fetching product ${i}/${productCount}`)
       const product = await contract.products(i)
+      
       if (product.isActive && product.quantity > 0) {
-        products.push({
+        const formattedProduct = {
           id: product.id.toString(),
           name: product.name,
           price: ethers.formatEther(product.price),
           quantity: product.quantity.toString(),
           seller: product.seller,
           isActive: product.isActive
-        })
+        }
+        console.log(`✅ Active product found:`, formattedProduct)
+        products.push(formattedProduct)
+      } else {
+        console.log(`❌ Product ${i} is inactive or sold out`)
       }
     }
 
+    console.log(`🎉 Returning ${products.length} active products`)
     return products
   } catch (error) {
-    console.error('Error fetching products:', error)
+    console.error('❌ Error fetching products:', error)
+    console.error('Contract address:', CONTRACT_ADDRESS)
+    console.error('Provider:', provider)
     return []
   }
 }
