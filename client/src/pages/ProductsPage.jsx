@@ -33,15 +33,20 @@ const ProductsPage = () => {
 
   const loadProducts = async () => {
     setLoading(true)
-    setError(null)
+    setErrorMessage('') // Clear any previous error messages
     
     try {
-      // Use wallet provider if available, otherwise use default provider for read-only access
-      const currentProvider = provider || getDefaultProvider()
+      // Use wallet provider if available, otherwise get default provider for read-only access
+      let currentProvider = provider
+      if (!currentProvider) {
+        console.log('🌐 No wallet connected, getting default provider...')
+        currentProvider = await getDefaultProvider()
+      }
+      
       const allProducts = await getAllProducts(currentProvider)
       setProducts(allProducts.filter(product => !product.sold))
     } catch (err) {
-      setError('Failed to load products. Please try again.')
+      setErrorMessage('Failed to load products. Please try again.')
       console.error('Error loading products:', err)
     } finally {
       setLoading(false)

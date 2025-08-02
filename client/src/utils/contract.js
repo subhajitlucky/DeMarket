@@ -404,25 +404,47 @@ export const getContract = (signerOrProvider) => {
 }
 
 // 🌐 GET DEFAULT PROVIDER (for read-only operations without wallet)
-export const getDefaultProvider = () => {
-  // Use reliable public Sepolia RPC endpoints with fallback
+export const getDefaultProvider = async () => {
+  // Multiple reliable Sepolia RPC endpoints
   const rpcUrls = [
-    'https://rpc.sepolia.org',
-    'https://sepolia.gateway.tenderly.co',
-    'https://ethereum-sepolia.blockpi.network/v1/rpc/public',
-    'https://rpc2.sepolia.org'
+    'https://sepolia.drpc.org',           // Same as your QuantumTicket
+    'https://rpc.sepolia.org',            // Primary public RPC
+    'https://ethereum-sepolia.blockpi.network/v1/rpc/public',  // BlockPI
+    'https://sepolia.gateway.tenderly.co', // Tenderly
+    'https://rpc2.sepolia.org'            // Secondary public RPC
   ]
   
-  // Try first RPC, can add fallback logic later
-  return new ethers.JsonRpcProvider(rpcUrls[0])
+  // Try each RPC until one works
+  for (let i = 0; i < rpcUrls.length; i++) {
+    try {
+      console.log(`🔄 Trying RPC ${i + 1}/${rpcUrls.length}: ${rpcUrls[i]}`)
+      
+      const provider = new ethers.JsonRpcProvider(rpcUrls[i])
+      
+      // Test the connection by getting the network
+      const network = await provider.getNetwork()
+      console.log(`✅ Connected to Sepolia via ${rpcUrls[i]}`)
+      console.log(`📋 Network: ${network.name} (Chain ID: ${network.chainId})`)
+      
+      return provider
+    } catch (error) {
+      console.warn(`❌ RPC ${i + 1} failed: ${error.message}`)
+      if (i === rpcUrls.length - 1) {
+        throw new Error(`All RPC endpoints failed. Last error: ${error.message}`)
+      }
+    }
+  }
 }
 
 // 📊 GET ALL ACTIVE PRODUCTS (Uses direct contract calls)
 export const getAllProducts = async (provider) => {
   try {
-    console.log('🔍 Fetching products with provider:', provider.connection?.url || 'Unknown RPC')
+    // If no provider is passed, get the default one
+    const currentProvider = provider || await getDefaultProvider()
     
-    const contract = getContract(provider)
+    console.log('🔍 Fetching products with provider:', currentProvider.connection?.url || 'Unknown RPC')
+    
+    const contract = getContract(currentProvider)
     console.log('📋 Contract instance created, getting product count...')
     
     const productCount = await contract.productCount()
