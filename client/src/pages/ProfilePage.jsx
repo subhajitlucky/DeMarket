@@ -1,17 +1,20 @@
 import { useState, useEffect } from 'react'
 import { useWallet } from '../wallet/contexts/WalletContext'
-import { getUserProducts } from '../utils/contract'
+import { getDashboardStats, getUserProducts } from '../utils/contract'
 import '../styles/ProfilePage.css'
 
 const ProfilePage = () => {
   const { account, provider, connectWallet, isConnected } = useWallet()
   const [activeTab, setActiveTab] = useState('overview')
   const [userStats, setUserStats] = useState({
-    totalListed: 0,
-    totalSold: 0,
-    totalBought: 0,
-    totalEarned: 0
+    totalPurchases: 0,
+    totalSales: 0,
+    totalSpent: '0',
+    totalEarned: '0',
+    activeProducts: 0
   })
+  const [purchaseHistory, setPurchaseHistory] = useState([])
+  const [salesHistory, setSalesHistory] = useState([])
   const [userProducts, setUserProducts] = useState([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -27,19 +30,24 @@ const ProfilePage = () => {
       setLoading(true)
       setError('')
       
-      const products = await getUserProducts(provider, account)
-      setUserProducts(products)
-      
-      // Calculate stats from actual data
-      const activeProducts = products.filter(p => p.isActive)
-      const soldOutProducts = products.filter(p => !p.isActive || p.quantity === '0')
+      // Load both dashboard stats and user products
+      const [dashboardData, products] = await Promise.all([
+        getDashboardStats(provider, account),
+        getUserProducts(provider, account)
+      ])
       
       setUserStats({
-        totalListed: products.length,
-        totalSold: soldOutProducts.length,
-        totalBought: 0, // This would need additional contract events to track
-        totalEarned: 0   // This would need additional contract events to track
+        totalPurchases: dashboardData.totalPurchases,
+        totalSales: dashboardData.totalSales,
+        totalSpent: dashboardData.totalSpent,
+        totalEarned: dashboardData.totalEarned,
+        activeProducts: dashboardData.activeProducts
       })
+      
+      setPurchaseHistory(dashboardData.recentPurchases)
+      setSalesHistory(dashboardData.recentSales)
+      setUserProducts(products)
+      
     } catch (err) {
       console.error('Error loading user data:', err)
       setError('Failed to load profile data')
@@ -92,21 +100,21 @@ const ProfilePage = () => {
           <div className="stat-card">
             <div className="stat-icon">📦</div>
             <div className="stat-info">
-              <h3>{userStats.totalListed}</h3>
-              <p>Products Listed</p>
+              <h3>{userStats.activeProducts}</h3>
+              <p>Active Products</p>
             </div>
           </div>
           <div className="stat-card">
             <div className="stat-icon">💰</div>
             <div className="stat-info">
-              <h3>{userStats.totalSold}</h3>
+              <h3>{userStats.totalSales}</h3>
               <p>Products Sold</p>
             </div>
           </div>
           <div className="stat-card">
             <div className="stat-icon">🛒</div>
             <div className="stat-info">
-              <h3>{userStats.totalBought}</h3>
+              <h3>{userStats.totalPurchases}</h3>
               <p>Items Bought</p>
             </div>
           </div>
@@ -119,19 +127,30 @@ const ProfilePage = () => {
           </div>
         </div>
 
-        {userProducts.length > 0 && (
+        {(purchaseHistory.length > 0 || salesHistory.length > 0) && (
           <div className="recent-activity">
-            <h3>Your Recent Products</h3>
+            <h3>Recent Activity</h3>
             <div className="activity-list">
-              {userProducts.slice(0, 3).map(product => (
-                <div key={product.id} className="activity-item">
-                  <span className="activity-icon">📦</span>
-                  <span className="activity-text">
-                    {product.name} - {product.price} ETH ({product.quantity} available)
-                  </span>
-                  <span className={`activity-status ${product.status}`}>
-                    {product.status === 'active' ? 'Active' : 'Sold Out'}
-                  </span>
+              {salesHistory.slice(0, 2).map(sale => (
+                <div key={sale.txHash} className="activity-item">
+                  <span className="activity-icon">💰</span>
+                  <div className="activity-details">
+                    <span className="activity-title">Sold {sale.productName}</span>
+                    <span className="activity-meta">
+                      +{sale.sellerEarned} ETH • {sale.timestamp}
+                    </span>
+                  </div>
+                </div>
+              ))}
+              {purchaseHistory.slice(0, 2).map(purchase => (
+                <div key={purchase.txHash} className="activity-item">
+                  <span className="activity-icon">�</span>
+                  <div className="activity-details">
+                    <span className="activity-title">Bought {purchase.productName}</span>
+                    <span className="activity-meta">
+                      -{purchase.totalPrice} ETH • {purchase.timestamp}
+                    </span>
+                  </div>
                 </div>
               ))}
             </div>
@@ -206,11 +225,34 @@ const ProfilePage = () => {
         <h3>My Purchases</h3>
         <p>Items you've bought from the marketplace</p>
       </div>
-      <div className="coming-soon">
-        <h4>Coming Soon!</h4>
-        <p>Purchase history tracking will be available in a future update.</p>
-        <p>This feature requires additional smart contract events to track buyer history.</p>
-      </div>
+      {purchaseHistory.length === 0 ? (
+        <div className="empty-state">
+          <p>No purchases yet</p>
+          <p>Start shopping to see your purchase history here</p>
+        </div>
+      ) : (
+        <div className="history-list">
+          {purchaseHistory.map(purchase => (
+            <div key={purchase.txHash} className="history-item">
+              <div className="item-icon">🛒</div>
+              <div className="item-details">
+                <h4>{purchase.productName}</h4>
+                <p>Quantity: {purchase.quantity}</p>
+                <p>Total: {purchase.totalPrice} ETH</p>
+                <p>Date: {purchase.timestamp}</p>
+                <a 
+                  href={`https://sepolia.etherscan.io/tx/${purchase.txHash}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="tx-link"
+                >
+                  View Transaction
+                </a>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   )
 
@@ -220,11 +262,36 @@ const ProfilePage = () => {
         <h3>Sales History</h3>
         <p>Track your successful sales</p>
       </div>
-      <div className="coming-soon">
-        <h4>Coming Soon!</h4>
-        <p>Sales history tracking will be available in a future update.</p>
-        <p>This feature requires additional smart contract events to track sales data.</p>
-      </div>
+      {salesHistory.length === 0 ? (
+        <div className="empty-state">
+          <p>No sales yet</p>
+          <p>List products to start selling and track your sales here</p>
+        </div>
+      ) : (
+        <div className="history-list">
+          {salesHistory.map(sale => (
+            <div key={sale.txHash} className="history-item">
+              <div className="item-icon">💰</div>
+              <div className="item-details">
+                <h4>{sale.productName}</h4>
+                <p>Quantity Sold: {sale.quantity}</p>
+                <p>Total Revenue: {sale.totalPrice} ETH</p>
+                <p>Your Earnings: {sale.sellerEarned} ETH</p>
+                <p>Platform Fee: {sale.platformFee} ETH</p>
+                <p>Date: {sale.timestamp}</p>
+                <a 
+                  href={`https://sepolia.etherscan.io/tx/${sale.txHash}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="tx-link"
+                >
+                  View Transaction
+                </a>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   )
 

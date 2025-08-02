@@ -9,10 +9,27 @@ const ProductsPage = () => {
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
   const [buyingProduct, setBuyingProduct] = useState(null)
+  const [successMessage, setSuccessMessage] = useState('')
+  const [errorMessage, setErrorMessage] = useState('')
 
   useEffect(() => {
     loadProducts()
   }, [provider])
+
+  // Clear messages after 5 seconds
+  useEffect(() => {
+    if (successMessage) {
+      const timer = setTimeout(() => setSuccessMessage(''), 5000)
+      return () => clearTimeout(timer)
+    }
+  }, [successMessage])
+
+  useEffect(() => {
+    if (errorMessage) {
+      const timer = setTimeout(() => setErrorMessage(''), 5000)
+      return () => clearTimeout(timer)
+    }
+  }, [errorMessage])
 
   const loadProducts = async () => {
     setLoading(true)
@@ -34,13 +51,17 @@ const ProductsPage = () => {
   })
 
   const handleBuyProduct = async (product, quantity = 1) => {
+    // Clear previous messages
+    setSuccessMessage('')
+    setErrorMessage('')
+
     if (!isConnected || !signer) {
-      alert('Please connect your wallet to buy products')
+      setErrorMessage('Please connect your wallet to buy products')
       return
     }
 
     if (product.seller.toLowerCase() === account.toLowerCase()) {
-      alert('You cannot buy your own product')
+      setErrorMessage('You cannot buy your own product')
       return
     }
 
@@ -50,13 +71,13 @@ const ProductsPage = () => {
       const result = await buyProduct(signer, product.id, quantity, totalPrice)
       
       if (result.success) {
-        alert('Product purchased successfully!')
+        setSuccessMessage(`Product purchased successfully! Transaction: ${result.txHash}`)
         loadProducts()
       } else {
-        alert('Error purchasing product: ' + result.error)
+        setErrorMessage(`Error purchasing product: ${result.error}`)
       }
     } catch (error) {
-      alert('Error purchasing product: ' + error.message)
+      setErrorMessage(`Error purchasing product: ${error.message}`)
     } finally {
       setBuyingProduct(null)
     }
@@ -99,6 +120,21 @@ const ProductsPage = () => {
           </div>
         </div>
 
+        {/* Success/Error Messages */}
+        <div className="container">
+          {successMessage && (
+            <div className="success-message">
+              {successMessage}
+            </div>
+          )}
+          
+          {errorMessage && (
+            <div className="error-message">
+              {errorMessage}
+            </div>
+          )}
+        </div>
+
         <div className="container">
           {filteredProducts.length === 0 ? (
             <div className="empty-state">
@@ -133,14 +169,18 @@ const ProductsPage = () => {
                         product.seller.toLowerCase() === account?.toLowerCase()
                       }
                     >
-                      {buyingProduct === product.id 
-                        ? 'Purchasing...' 
-                        : product.seller.toLowerCase() === account?.toLowerCase()
-                        ? 'Your Product'
-                        : !isConnected 
-                        ? 'Connect Wallet'
-                        : 'Buy Now'
-                      }
+                      {buyingProduct === product.id ? (
+                        <>
+                          <span className="loading-spinner"></span>
+                          Purchasing...
+                        </>
+                      ) : product.seller.toLowerCase() === account?.toLowerCase() ? (
+                        'Your Product'
+                      ) : !isConnected ? (
+                        'Connect Wallet'
+                      ) : (
+                        'Buy Now'
+                      )}
                     </button>
                   </div>
                 </div>

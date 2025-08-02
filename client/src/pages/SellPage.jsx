@@ -4,7 +4,7 @@ import { addProduct } from '../utils/contract'
 import '../styles/SellPage.css'
 
 const SellPage = () => {
-  const { signer, isConnected, connectWallet } = useWallet()
+  const { signer, isConnected } = useWallet()
   const [formData, setFormData] = useState({
     name: '',
     price: '',
@@ -14,6 +14,8 @@ const SellPage = () => {
     image: '🍎'
   })
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [successMessage, setSuccessMessage] = useState('')
+  const [errorMessage, setErrorMessage] = useState('')
 
   const categories = [
     { value: 'fruits', label: 'Fruits' },
@@ -38,11 +40,13 @@ const SellPage = () => {
     e.preventDefault()
     
     if (!isConnected || !signer) {
-      alert('Please connect your wallet to list products')
+      setErrorMessage('Please connect your wallet to list products')
       return
     }
 
     setIsSubmitting(true)
+    setSuccessMessage('')
+    setErrorMessage('')
 
     try {
       const result = await addProduct(
@@ -53,9 +57,9 @@ const SellPage = () => {
       )
       
       if (result.success) {
-        alert('Product listed successfully on the blockchain!')
+        setSuccessMessage(`🎉 "${formData.name}" listed successfully on the blockchain! Transaction: ${result.txHash.slice(0, 10)}...`)
         
-        // Reset form
+        // Reset form after success
         setFormData({
           name: '',
           price: '',
@@ -64,11 +68,14 @@ const SellPage = () => {
           description: '',
           image: '🍎'
         })
+        
+        // Clear success message after 5 seconds
+        setTimeout(() => setSuccessMessage(''), 5000)
       } else {
-        alert('Error listing product: ' + result.error)
+        setErrorMessage('Failed to list product: ' + result.error)
       }
     } catch (error) {
-      alert('Error listing product: ' + error.message)
+      setErrorMessage('Error listing product: ' + error.message)
     } finally {
       setIsSubmitting(false)
     }
@@ -216,12 +223,32 @@ const SellPage = () => {
                 />
               </div>
 
+              {/* Success/Error Messages */}
+              {successMessage && (
+                <div className="success-message">
+                  {successMessage}
+                </div>
+              )}
+              
+              {errorMessage && (
+                <div className="error-message">
+                  {errorMessage}
+                </div>
+              )}
+
               <button
                 type="submit"
                 disabled={isSubmitting}
                 className="submit-button"
               >
-                {isSubmitting ? 'Listing Product...' : 'List Product'}
+                {isSubmitting ? (
+                  <>
+                    <span className="loading-spinner"></span>
+                    Listing Product...
+                  </>
+                ) : (
+                  'List Product'
+                )}
               </button>
             </form>
           </div>

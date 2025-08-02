@@ -17,8 +17,17 @@ export const WalletProvider = ({ children }) => {
   const [signer, setSigner] = useState(null)
   const [isConnecting, setIsConnecting] = useState(false)
   const [chainId, setChainId] = useState(null)
+  const [walletError, setWalletError] = useState('')
 
   console.log('🔧 WalletProvider State:', { account, isConnecting, chainId })
+
+  // Auto-clear wallet error after 5 seconds
+  useEffect(() => {
+    if (walletError) {
+      const timer = setTimeout(() => setWalletError(''), 5000)
+      return () => clearTimeout(timer)
+    }
+  }, [walletError])
 
   useEffect(() => {
     console.log('🚀 WalletProvider useEffect running...')
@@ -74,7 +83,7 @@ export const WalletProvider = ({ children }) => {
               setChainId(network.chainId.toString())
               console.log('✅ Connection restored via eth_accounts:', ethAccounts[0])
             }
-          } catch (altError) {
+          } catch {
             console.log('ℹ️ No existing connection found (this is normal)')
           }
         }
@@ -89,6 +98,9 @@ export const WalletProvider = ({ children }) => {
   const connectWallet = async () => {
     console.log('🚀 Connect wallet button clicked!')
     
+    // Clear previous errors
+    setWalletError('')
+    
     // Prevent multiple connection attempts
     if (isConnecting) {
       console.log('⚠️ Already connecting, ignoring click')
@@ -98,7 +110,7 @@ export const WalletProvider = ({ children }) => {
     try {
       if (!window.ethereum) {
         console.log('❌ MetaMask not installed')
-        alert('MetaMask is not installed. Please install MetaMask to use this dApp.')
+        setWalletError('MetaMask is not installed. Please install MetaMask to use this dApp.')
         return
       }
       
@@ -154,13 +166,13 @@ export const WalletProvider = ({ children }) => {
       console.error('❌ Error connecting wallet:', error)
       if (error.code === 4001) {
         console.log('🚫 User rejected connection request')
-        alert('Please connect to MetaMask.')
+        setWalletError('Please connect to MetaMask.')
       } else if (error.name === 'AbortError') {
         console.log('⏰ Connection timed out')
-        alert('Connection timed out. Please make sure MetaMask is unlocked and try again.')
+        setWalletError('Connection timed out. Please make sure MetaMask is unlocked and try again.')
       } else {
         console.log('💥 Unknown error occurred:', error.message)
-        alert('An error occurred while connecting to the wallet: ' + error.message)
+        setWalletError('An error occurred while connecting to the wallet: ' + error.message)
       }
     } finally {
       console.log('🏁 Setting isConnecting to false...')
@@ -174,7 +186,12 @@ export const WalletProvider = ({ children }) => {
     setProvider(null)
     setSigner(null)
     setChainId(null)
+    setWalletError('')
     console.log('✅ Wallet disconnected')
+  }
+
+  const clearWalletError = () => {
+    setWalletError('')
   }
 
   const handleAccountsChanged = (accounts) => {
@@ -206,8 +223,10 @@ export const WalletProvider = ({ children }) => {
     signer,
     chainId,
     isConnecting,
+    walletError,
     connectWallet,
     disconnectWallet,
+    clearWalletError,
     formatAddress,
     isConnected: !!account
   }

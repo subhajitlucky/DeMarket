@@ -131,3 +131,60 @@
     font-size: 11px;
   }
 }
+
+/* Error Message Styles */
+.wallet-error-message {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #fef2f2;
+  border: 1px solid #fca5a5;
+  border-radius: 6px;
+  padding: 8px 12px;
+  margin-bottom: 8px;
+  color: #dc2626;
+  font-size: 12px;
+  max-width: 300px;
+  word-wrap: break-word;
+}
+
+.error-close-btn {
+  background: none;
+  border: none;
+  color: #dc2626;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 0;
+  margin-left: 8px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.error-close-btn:hover {
+  color: #b91c1c;
+}
+
+/* Connecting Status Styles */
+.connecting-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: #6b7280;
+  margin-top: 4px;
+}
+
+.loading-spinner {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border: 2px solid transparent;
+  border-top: 2px solid #6b7280;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}

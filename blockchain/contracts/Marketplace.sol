@@ -20,25 +20,36 @@ contract DeMarketplace is Ownable, ReentrancyGuard {
         bool isActive;
     }
 
+    // CORE DATA: Only store what we MUST have on-chain
     mapping(uint => Product) public products;
 
+    // EVENTS: These are our "free receipt book" for dashboard data
+    // Events are stored on blockchain but FREE to read!
     event ProductAdded(
-        uint indexed id,
-        address indexed seller,
+        uint indexed id,           // indexed = easy to search by this field
+        address indexed seller,    // indexed = easy to search by seller
         string name,
         uint price,
-        uint quantity
+        uint quantity,
+        uint timestamp            // when it was added
     );
 
     event ProductBought(
-        uint indexed id,
-        address indexed buyer,
+        uint indexed productId,   // indexed = easy to search by product
+        address indexed buyer,    // indexed = easy to search by buyer  
+        address indexed seller,   // indexed = easy to search by seller
+        string productName,       // we include name so we don't need another query
         uint quantity,
         uint totalPrice,
-        uint platformFee
+        uint platformFee,
+        uint timestamp           // when it was bought
     );
 
-    event FeesWithdrawn(address indexed owner, uint amount);
+    event FeesWithdrawn(
+        address indexed owner, 
+        uint amount,
+        uint timestamp
+    );
 
     // Add a new product for sale
     function addProduct(string calldata name, uint price, uint quantity) external {
@@ -55,7 +66,15 @@ contract DeMarketplace is Ownable, ReentrancyGuard {
             isActive: true
         });
 
-        emit ProductAdded(productCount, msg.sender, name, price, quantity);
+        // 📝 EMIT EVENT: This is our "receipt" that frontend will read for FREE
+        emit ProductAdded(
+            productCount, 
+            msg.sender, 
+            name, 
+            price, 
+            quantity,
+            block.timestamp    // current time when product was added
+        );
     }
 
     // Buy a product
@@ -88,7 +107,27 @@ contract DeMarketplace is Ownable, ReentrancyGuard {
             require(refundSuccess, "Refund failed");
         }
 
-        emit ProductBought(productId, msg.sender, quantityToBuy, totalPrice, fee);
+        // 📝 EMIT RICH EVENT: All the data needed for dashboard, FREE to read!
+        emit ProductBought(
+            productId,
+            msg.sender,        // buyer
+            product.seller,    // seller  
+            product.name,      // product name (so UI doesn't need another call)
+            quantityToBuy,
+            totalPrice,
+            fee,
+            block.timestamp    // when purchase happened
+        );
+    }
+
+    // 📊 SIMPLE GETTER: Get a specific product (this is cheap!)
+    function getProduct(uint productId) external view returns (Product memory) {
+        return products[productId];
+    }
+
+    // 📊 SIMPLE GETTER: Get total number of products ever created
+    function getTotalProductCount() external view returns (uint) {
+        return productCount;
     }
 
     // Withdraw accumulated platform fees
@@ -99,6 +138,7 @@ contract DeMarketplace is Ownable, ReentrancyGuard {
         (bool success, ) = payable(owner()).call{value: amount}("");
         require(success, "Withdrawal failed");
 
-        emit FeesWithdrawn(owner(), amount);
+        // 📝 EMIT EVENT: Track when fees are withdrawn
+        emit FeesWithdrawn(owner(), amount, block.timestamp);
     }
 }
