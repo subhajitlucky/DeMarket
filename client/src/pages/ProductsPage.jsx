@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useWallet } from '../wallet/contexts/WalletContext'
-import { getAllProducts, buyProduct } from '../utils/contract'
+import { getAllProducts, buyProduct, getDefaultProvider } from '../utils/contract'
 import '../styles/ProductsPage.css'
 
 const ProductsPage = () => {
@@ -33,13 +33,16 @@ const ProductsPage = () => {
 
   const loadProducts = async () => {
     setLoading(true)
+    setError(null)
+    
     try {
-      if (provider) {
-        const blockchainProducts = await getAllProducts(provider)
-        setProducts(blockchainProducts)
-      }
-    } catch (error) {
-      console.error('Error loading products:', error)
+      // Use wallet provider if available, otherwise use default provider for read-only access
+      const currentProvider = provider || getDefaultProvider()
+      const allProducts = await getAllProducts(currentProvider)
+      setProducts(allProducts.filter(product => !product.sold))
+    } catch (err) {
+      setError('Failed to load products. Please try again.')
+      console.error('Error loading products:', err)
     } finally {
       setLoading(false)
     }

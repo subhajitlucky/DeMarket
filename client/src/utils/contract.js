@@ -403,6 +403,12 @@ export const getContract = (signerOrProvider) => {
   return new ethers.Contract(CONTRACT_ADDRESS, CONTRACT_ABI, signerOrProvider)
 }
 
+// 🌐 GET DEFAULT PROVIDER (for read-only operations without wallet)
+export const getDefaultProvider = () => {
+  // Use public Sepolia RPC endpoints (no API key needed)
+  return new ethers.JsonRpcProvider('https://rpc.sepolia.org')
+}
+
 // 📊 GET ALL ACTIVE PRODUCTS (Uses direct contract calls)
 export const getAllProducts = async (provider) => {
   try {
