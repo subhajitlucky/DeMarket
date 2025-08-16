@@ -107,12 +107,22 @@ const ProductsPage = () => {
   return (
     <div className="page-container">
       <div className="products-page">
-        <header className="products-header">
+        <div className="products-header">
           <div className="container">
-            <h1>Fresh Products</h1>
-            <p>Discover products from local sellers on the blockchain</p>
+            <div className="header-content">
+              <div className="header-text">
+                <h1>Fresh Products</h1>
+                <p>Discover products from local sellers on the blockchain</p>
+              </div>
+              <div className="header-stats">
+                <div className="stat-item">
+                  <span className="stat-number">{filteredProducts.length}</span>
+                  <span className="stat-label">Products</span>
+                </div>
+              </div>
+            </div>
           </div>
-        </header>
+        </div>
 
         <div className="products-filters">
           <div className="container">
@@ -146,6 +156,13 @@ const ProductsPage = () => {
         <div className="container">
           {filteredProducts.length === 0 ? (
             <div className="empty-state">
+              <div className="empty-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="9" cy="21" r="1"></circle>
+                  <circle cx="20" cy="21" r="1"></circle>
+                  <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+                </svg>
+              </div>
               <h3>No products found</h3>
               <p>
                 {products.length === 0 
@@ -156,43 +173,66 @@ const ProductsPage = () => {
             </div>
           ) : (
             <div className="products-grid">
-              {filteredProducts.map(product => (
-                <div key={product.id} className="product-card">
-                  <div className="product-image">
-                    <span className="product-emoji">📦</span>
+              {filteredProducts.map(product => {
+                const isOwnProduct = account && product.seller.toLowerCase() === account.toLowerCase();
+                return (
+                  <div key={product.id} className="product-card">
+                    <div className="product-image">
+                      <div className="product-placeholder">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+                          <line x1="3" y1="6" x2="21" y2="6"></line>
+                          <path d="M16 10a4 4 0 0 1-8 0"></path>
+                        </svg>
+                      </div>
+                    </div>
+                    <div className="product-content">
+                      <div className="product-header">
+                        <h3 className="product-name">{product.name}</h3>
+                        <p className="product-price">{product.price} ETH</p>
+                      </div>
+                      <div className="product-details">
+                        <div className="detail-row">
+                          <span className="detail-label">Available:</span>
+                          <span className="detail-value">{product.quantity}</span>
+                        </div>
+                        <div className="detail-row">
+                          <span className="detail-label">Seller:</span>
+                          <span className="detail-value seller-address" title={product.seller}>
+                            {product.seller.slice(0, 6)}...{product.seller.slice(-4)}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="product-actions">
+                        {isOwnProduct ? (
+                          <button className="btn btn-secondary" disabled>
+                            Your Product
+                          </button>
+                        ) : !isConnected ? (
+                          <button className="btn btn-primary">
+                            Connect Wallet to Buy
+                          </button>
+                        ) : (
+                          <button 
+                            className="btn btn-primary"
+                            onClick={() => handleBuyProduct(product)}
+                            disabled={buyingProduct === product.id}
+                          >
+                            {buyingProduct === product.id ? (
+                              <>
+                                <span className="loading-spinner"></span>
+                                Purchasing...
+                              </>
+                            ) : (
+                              'Buy Now'
+                            )}
+                          </button>
+                        )}
+                      </div>
+                    </div>
                   </div>
-                  <div className="product-info">
-                    <h3 className="product-name">{product.name}</h3>
-                    <p className="product-price">{product.price} ETH</p>
-                    <p className="product-quantity">Available: {product.quantity}</p>
-                    <p className="product-seller">
-                      Seller: {product.seller.slice(0, 6)}...{product.seller.slice(-4)}
-                    </p>
-                    <button 
-                      className="buy-button"
-                      onClick={() => handleBuyProduct(product)}
-                      disabled={
-                        buyingProduct === product.id || 
-                        !isConnected || 
-                        product.seller.toLowerCase() === account?.toLowerCase()
-                      }
-                    >
-                      {buyingProduct === product.id ? (
-                        <>
-                          <span className="loading-spinner"></span>
-                          Purchasing...
-                        </>
-                      ) : product.seller.toLowerCase() === account?.toLowerCase() ? (
-                        'Your Product'
-                      ) : !isConnected ? (
-                        'Connect Wallet'
-                      ) : (
-                        'Buy Now'
-                      )}
-                    </button>
-                  </div>
-                </div>
-              ))}
+                )
+              })}
             </div>
           )}
         </div>

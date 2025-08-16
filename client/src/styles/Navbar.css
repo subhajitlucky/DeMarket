@@ -1,12 +1,12 @@
 @import './variables.css';
 
 .navbar {
-  background: var(--bg-dark);
-  box-shadow: var(--shadow-lg);
+  background: var(--white);
+  box-shadow: var(--shadow-sm);
   position: sticky;
   top: 0;
   z-index: 1000;
-  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--gray-200);
 }
 
 .navbar-container {
@@ -21,28 +21,25 @@
 
 .navbar-brand {
   text-decoration: none;
-  color: var(--text-white);
+  color: var(--primary-dark);
   font-weight: 700;
   font-size: 1.5rem;
   transition: var(--transition-fast);
+  display: flex;
+  align-items: center;
 }
 
 .navbar-brand:hover {
-  color: var(--text-white);
+  color: var(--primary-accent);
   text-decoration: none;
-  transform: scale(1.05);
+  transform: translateY(-1px);
 }
 
 .navbar-brand h2 {
   margin: 0;
-  font-size: 1.8rem;
+  font-size: 1.5rem;
   font-weight: 700;
-  /* Use solid white color matching footer */
-  color: var(--text-white);
-  background: none;
-  -webkit-background-clip: unset;
-  -webkit-text-fill-color: unset;
-  background-clip: unset;
+  color: var(--primary-dark);
 }
 
 .navbar-menu {
@@ -52,10 +49,10 @@
 }
 
 .navbar-item {
-  color: var(--text-white);
+  color: var(--text-secondary);
   text-decoration: none;
   font-weight: 500;
-  font-size: 1.1rem;
+  font-size: 1rem;
   padding: var(--spacing-sm) var(--spacing-md);
   border-radius: var(--radius-md);
   transition: var(--transition-normal);
@@ -70,19 +67,22 @@
   transform: translateX(-50%);
   width: 0;
   height: 2px;
-  background: var(--accent-green);
+  background: var(--primary-accent);
   transition: var(--transition-normal);
 }
 
 .navbar-item:hover {
-  background: rgba(255, 255, 255, 0.1);
-  transform: translateY(-2px);
-  color: var(--text-white);
+  color: var(--primary-accent);
   text-decoration: none;
 }
 
 .navbar-item:hover::after {
-  width: 80%;
+  width: 100%;
+}
+
+.navbar-item.active {
+  color: var(--primary-accent);
+  font-weight: 600;
 }
 
 .navbar-wallet {
@@ -91,23 +91,22 @@
 }
 
 .connect-wallet-btn {
-  background: linear-gradient(135deg, #2196F3, #1976D2);
+  background: var(--primary-accent);
   color: var(--text-white);
-  border: 2px solid rgba(33, 150, 243, 0.5);
-  padding: var(--spacing-md) var(--spacing-xl);
-  border-radius: var(--radius-full);
+  border: none;
+  padding: var(--spacing-sm) var(--spacing-lg);
+  border-radius: var(--radius-md);
   font-weight: 600;
   cursor: pointer;
   transition: var(--transition-normal);
-  backdrop-filter: blur(10px);
-  font-size: 0.95rem;
+  font-size: 0.9rem;
+  box-shadow: var(--shadow-sm);
 }
 
 .connect-wallet-btn:hover {
-  background: linear-gradient(135deg, #1976D2, #1565C0);
-  border-color: rgba(33, 150, 243, 0.8);
-  transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(33, 150, 243, 0.3);
+  background: var(--primary-blue);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
 }
 
 /* Mobile Styles */

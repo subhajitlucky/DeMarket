@@ -22,10 +22,9 @@ const SellPage = () => {
     { value: 'vegetables', label: 'Vegetables' }
   ]
 
-  const emojis = [
-    '🍎', '🍌', '🍊', '🍇', '🍓', '🥝', '🍑', '🍒',
-    '🥕', '🍅', '🥬', '🥒', '🌽', '🥔', '🍆', '🥦',
-    '🥑', '🌶️', '🥜', '🥥'
+  const icons = [
+    '🍎', '🥕', '🍇', '🥬', '🌽', '🍓', '🥔', '🥦',
+    '🍊', '🥒', '🍒', '🍆', '🍑', '🍌', '🥝', '🥑'
   ]
 
   const handleInputChange = (e) => {
@@ -57,7 +56,7 @@ const SellPage = () => {
       )
       
       if (result.success) {
-        setSuccessMessage(`🎉 "${formData.name}" listed successfully on the blockchain! Transaction: ${result.txHash.slice(0, 10)}...`)
+        setSuccessMessage(`"${formData.name}" listed successfully on the blockchain! Transaction: ${result.txHash.slice(0, 10)}...`)
         
         // Reset form after success
         setFormData({
@@ -197,14 +196,14 @@ const SellPage = () => {
               <div className="form-group">
                 <label htmlFor="image">Product Icon</label>
                 <div className="emoji-selector">
-                  {emojis.map(emoji => (
+                  {icons.map((icon, index) => (
                     <button
-                      key={emoji}
+                      key={index}
                       type="button"
-                      className={`emoji-option ${formData.image === emoji ? 'selected' : ''}`}
-                      onClick={() => setFormData(prev => ({ ...prev, image: emoji }))}
+                      className={`emoji-option ${formData.image === icon ? 'selected' : ''}`}
+                      onClick={() => setFormData(prev => ({ ...prev, image: icon }))}
                     >
-                      {emoji}
+                      {icon}
                     </button>
                   ))}
                 </div>
@@ -257,7 +256,13 @@ const SellPage = () => {
             <h3>Preview</h3>
             <div className="product-preview">
               <div className="preview-image">
-                <span className="preview-emoji">{formData.image}</span>
+                <div className="preview-icon">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+                    <line x1="3" y1="6" x2="21" y2="6"></line>
+                    <path d="M16 10a4 4 0 0 1-8 0"></path>
+                  </svg>
+                </div>
               </div>
               <div className="preview-info">
                 <h4>{formData.name || 'Product Name'}</h4>

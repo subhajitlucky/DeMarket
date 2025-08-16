@@ -6,7 +6,7 @@
 }
 
 .wallet-connect-btn {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #2196F3;
   color: white;
   border: none;
   padding: 12px 24px;
@@ -17,11 +17,13 @@
   transition: all 0.3s ease;
   white-space: nowrap;
   min-width: 140px;
+  box-shadow: 0 4px 6px rgba(33, 150, 243, 0.3);
 }
 
 .wallet-connect-btn:hover {
+  background: #1976D2;
   transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+  box-shadow: 0 8px 25px rgba(25, 118, 210, 0.4);
 }
 
 .wallet-connect-btn:active {
@@ -35,7 +37,7 @@
 }
 
 .wallet-connect-btn.connecting {
-  background: linear-gradient(135deg, #94a3d3 0%, #a687c4 100%);
+  background: #1976D2;
 }
 
 .wallet-reset-btn {
