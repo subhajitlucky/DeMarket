@@ -1,10 +1,13 @@
 import { useState, useEffect } from 'react'
-import { useWallet } from '../wallet/contexts/WalletContext'
+import { useAccount, useWalletClient } from 'wagmi'
+import { BrowserProvider } from 'ethers'
 import { getAllProducts, buyProduct, getDefaultProvider } from '../utils/contract'
 import '../styles/ProductsPage.css'
 
 const ProductsPage = () => {
-  const { provider, signer, isConnected, account } = useWallet()
+  const { address, isConnected } = useAccount()
+  const { data: walletClient } = useWalletClient()
+  
   const [products, setProducts] = useState([])
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
@@ -14,7 +17,7 @@ const ProductsPage = () => {
 
   useEffect(() => {
     loadProducts()
-  }, [provider])
+  }, [isConnected])
 
   // Clear messages after 5 seconds
   useEffect(() => {
@@ -36,12 +39,9 @@ const ProductsPage = () => {
     setErrorMessage('') // Clear any previous error messages
     
     try {
-      // Use wallet provider if available, otherwise get default provider for read-only access
-      let currentProvider = provider
-      if (!currentProvider) {
-        console.log('🌐 No wallet connected, getting default provider...')
-        currentProvider = await getDefaultProvider()
-      }
+      // Always use default provider for reading products (no wallet needed)
+      console.log('🌐 Loading products with default provider...')
+      const currentProvider = await getDefaultProvider()
       
       const allProducts = await getAllProducts(currentProvider)
       setProducts(allProducts.filter(product => !product.sold))
@@ -63,18 +63,22 @@ const ProductsPage = () => {
     setSuccessMessage('')
     setErrorMessage('')
 
-    if (!isConnected || !signer) {
+    if (!isConnected || !walletClient) {
       setErrorMessage('Please connect your wallet to buy products')
       return
     }
 
-    if (product.seller.toLowerCase() === account.toLowerCase()) {
+    if (product.seller.toLowerCase() === address.toLowerCase()) {
       setErrorMessage('You cannot buy your own product')
       return
     }
 
     setBuyingProduct(product.id)
     try {
+      // Get signer from walletClient
+      const provider = new BrowserProvider(walletClient)
+      const signer = await provider.getSigner()
+      
       const totalPrice = parseFloat(product.price) * quantity
       const result = await buyProduct(signer, product.id, quantity, totalPrice)
       
@@ -174,7 +178,7 @@ const ProductsPage = () => {
           ) : (
             <div className="products-grid">
               {filteredProducts.map(product => {
-                const isOwnProduct = account && product.seller.toLowerCase() === account.toLowerCase();
+                const isOwnProduct = address && product.seller.toLowerCase() === address.toLowerCase();
                 return (
                   <div key={product.id} className="product-card">
                     <div className="product-image">

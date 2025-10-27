@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react'
-import { useWallet } from '../wallet/contexts/WalletContext'
+import { useAccount, useWalletClient } from 'wagmi'
+import { BrowserProvider } from 'ethers'
+import { ConnectButton } from '@rainbow-me/rainbowkit'
 import { getDashboardStats, getUserProducts } from '../utils/contract'
 import Overview from '../components/profile/Overview'
 import Listings from '../components/profile/Listings'
@@ -8,7 +10,8 @@ import Sales from '../components/profile/Sales'
 import '../styles/ProfilePage.css'
 
 const ProfilePage = () => {
-  const { account, provider, connectWallet, isConnected } = useWallet()
+  const { address, isConnected } = useAccount()
+  const { data: walletClient } = useWalletClient()
   const [activeTab, setActiveTab] = useState('overview')
   const [userStats, setUserStats] = useState({
     totalPurchases: 0,
@@ -24,7 +27,7 @@ const ProfilePage = () => {
   const [error, setError] = useState('')
 
   useEffect(() => {
-    if (isConnected && account && provider) {
+    if (isConnected && address && walletClient) {
       loadUserData()
     } else {
       // Reset all data when wallet is disconnected
@@ -40,17 +43,26 @@ const ProfilePage = () => {
       setUserProducts([])
       setError('')
     }
-  }, [isConnected, account, provider])
+  }, [isConnected, address])
 
   const loadUserData = async () => {
     try {
       setLoading(true)
       setError('')
       
+      // Get provider from walletClient
+      const provider = walletClient ? new BrowserProvider(walletClient) : null
+      
+      if (!provider) {
+        setError('Wallet not connected')
+        setLoading(false)
+        return
+      }
+      
       // Load both dashboard stats and user products
       const [dashboardData, products] = await Promise.all([
-        getDashboardStats(provider, account),
-        getUserProducts(provider, account)
+        getDashboardStats(provider, address),
+        getUserProducts(provider, address)
       ])
       
       setUserStats({
@@ -89,12 +101,12 @@ const ProfilePage = () => {
                 <h1>My Profile</h1>
                 {isConnected ? (
                   <p className="wallet-address">
-                    Connected: {account?.slice(0, 6)}...{account?.slice(-4)}
+                    Connected: {address?.slice(0, 6)}...{address?.slice(-4)}
                   </p>
                 ) : (
-                  <button onClick={connectWallet} className="connect-btn">
-                    Connect Wallet
-                  </button>
+                  <div style={{ marginTop: '10px' }}>
+                    <ConnectButton />
+                  </div>
                 )}
               </div>
             </div>
@@ -135,7 +147,6 @@ const ProfilePage = () => {
             {activeTab === 'overview' && (
               <Overview 
                 isConnected={isConnected}
-                connectWallet={connectWallet}
                 loading={loading}
                 userStats={userStats}
                 purchaseHistory={purchaseHistory}
@@ -145,7 +156,6 @@ const ProfilePage = () => {
             {activeTab === 'listings' && (
               <Listings 
                 isConnected={isConnected}
-                connectWallet={connectWallet}
                 loading={loading}
                 userProducts={userProducts}
               />
@@ -153,7 +163,6 @@ const ProfilePage = () => {
             {activeTab === 'purchases' && (
               <Purchases 
                 isConnected={isConnected}
-                connectWallet={connectWallet}
                 loading={loading}
                 purchaseHistory={purchaseHistory}
               />
@@ -161,7 +170,6 @@ const ProfilePage = () => {
             {activeTab === 'sales' && (
               <Sales 
                 isConnected={isConnected}
-                connectWallet={connectWallet}
                 loading={loading}
                 salesHistory={salesHistory}
               />

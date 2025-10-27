@@ -1,16 +1,15 @@
 import React from 'react';
+import { ConnectButton } from '@rainbow-me/rainbowkit';
 import '../../styles/ProfilePage.css';
 
-const Purchases = ({ isConnected, connectWallet, loading, purchaseHistory }) => {
+const Purchases = ({ isConnected, loading, purchaseHistory }) => {
   if (!isConnected) {
     return (
       <div className="purchases-content">
         <div className="connect-prompt">
           <h3>Connect Your Wallet</h3>
           <p>Connect your wallet to view your purchase history</p>
-          <button onClick={connectWallet} className="connect-btn">
-            Connect Wallet
-          </button>
+          <ConnectButton />
         </div>
       </div>
     );
